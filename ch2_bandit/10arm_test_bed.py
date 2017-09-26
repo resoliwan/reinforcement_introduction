@@ -26,7 +26,7 @@ class N_arm_test_bed:
         self.reward_dists = reward_dists
         self.max_action = max(reward_dists, key=(lambda key: reward_dists[key][0]))
         self.avg_rewards = []
-        self.optimal_action_percent = []
+        self.optimal_action_percents = []
         self.total_reward = 0
 
     def get_reward(self, action):
@@ -67,23 +67,32 @@ class N_arm_test_bed:
             old_action_esimation = self.action_estimations[action]
             self.action_estimations[action] = old_action_esimation + step_size * (reward - old_action_esimation)
 
+            self.optimal_action_percents.append(self.action_counts[self.max_action]/i)
 
-
-
-
-        return self.avg_rewards
+        return self.avg_rewards, self.optimal_action_percents
 
 count = 10000
 test1 = N_arm_test_bed(reward_dists, 0.1)
-test1_average_rewards = test1.maximize_reward(count)
+test1_avg_rewards, test1_optimal_percents = test1.maximize_reward(count)
 test2 = N_arm_test_bed(reward_dists, 0.01)
-test2_average_rewards = test2.maximize_reward(count)
+test2_avg_rewards, test2_optimal_percents = test2.maximize_reward(count)
 test3 = N_arm_test_bed(reward_dists, 0)
-test3_average_rewards = test3.maximize_reward(count)
+test3_avg_rewards, test3_optimal_percents = test3.maximize_reward(count)
 
-plt.plot(range(0, count), test1_average_rewards, label='0.1')
-plt.plot(range(0, count), test2_average_rewards, label='0.01')
-plt.plot(range(0, count), test3_average_rewards, label='0')
+#Show avg action value
+plt.subplot(121)
+plt.title('Avg action value')
+plt.plot(range(0, count), test1_avg_rewards, label='0.1')
+plt.plot(range(0, count), test2_avg_rewards, label='0.01')
+plt.plot(range(0, count), test3_avg_rewards, label='0')
+plt.legend()
+
+plt.subplot(122)
+#Show optimal action percent
+plt.title('optimal action percent')
+plt.plot(range(0, count), test1_optimal_percents, label='0.1')
+plt.plot(range(0, count), test2_optimal_percents, label='0.01')
+plt.plot(range(0, count), test3_optimal_percents, label='0')
 plt.legend()
 plt.show()
 
